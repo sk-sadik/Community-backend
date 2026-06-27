@@ -827,7 +827,7 @@
 	"variable": [
 		{
 			"key": "HOST",
-			"value": "http://localhost:5000",
+			"value": "https://community-backend-pc5b.onrender.com/",
 			"type": "string"
 		},
 		{
