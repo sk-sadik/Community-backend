@@ -1,0 +1,854 @@
+{
+	"info": {
+		"_postman_id": "840fb7e9-a86d-4767-bc18-2e0618ff7e41",
+		"name": "Community Service Portal",
+		"description": "Production-ready Postman collection for verifying, testing, and managing API endpoints on the Community Service Portal backend.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\",\n    \"phone\": \"9876543210\",\n    \"address\": \"123 Main St, Sector 4\",\n    \"city\": \"Hyderabad\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST}}/api/auth/register",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Admin User\",\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\",\n    \"phone\": \"9998887776\",\n    \"address\": \"Admin Office, HQ\",\n    \"city\": \"Hyderabad\",\n    \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST}}/api/auth/register",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"TOKEN\", jsonData.token);",
+									"    console.log(\"Saved User JWT Token to Environment: \" + jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST}}/api/auth/login",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.environment.set(\"TOKEN\", jsonData.token);",
+									"    console.log(\"Saved Admin JWT Token to Environment: \" + jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST}}/api/auth/login",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/auth/profile",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Issues",
+			"item": [
+				{
+					"name": "Create Issue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Huge Pothole on Main Road",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "A critical road problem creating traffic jams and risk of accidents near the shopping mall complex.",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Road",
+									"type": "text"
+								},
+								{
+									"key": "priority",
+									"value": "High",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Kavuri Hills Main Rd, near Nexus Mall",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Hyderabad",
+									"type": "text"
+								},
+								{
+									"key": "district",
+									"value": "Rangareddy",
+									"type": "text"
+								},
+								{
+									"key": "state",
+									"value": "Telangana",
+									"type": "text"
+								},
+								{
+									"key": "pincode",
+									"value": "500033",
+									"type": "text"
+								},
+								{
+									"key": "latitude",
+									"value": "17.4348",
+									"type": "text"
+								},
+								{
+									"key": "longitude",
+									"value": "78.3968",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"description": "Select an image showing the pothole",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{HOST}}/api/issues",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"issues"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Issues (Filtered)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/issues?category=Road&priority=High&city=Hyderabad&search=Pothole&page=1&limit=10",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"issues"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Road",
+									"description": "Filter by Category"
+								},
+								{
+									"key": "priority",
+									"value": "High",
+									"description": "Filter by Priority"
+								},
+								{
+									"key": "city",
+									"value": "Hyderabad",
+									"description": "Filter by City name"
+								},
+								{
+									"key": "search",
+									"value": "Pothole",
+									"description": "Regex search on title or description"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page offset index"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Page count size limit"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Issue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/issues/{{ISSUE_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"issues",
+								"{{ISSUE_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Own Issue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Updated Pothole Title",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Updated Pothole Description indicating severity has increased",
+									"type": "text"
+								},
+								{
+									"key": "priority",
+									"value": "High",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{HOST}}/api/issues/{{ISSUE_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"issues",
+								"{{ISSUE_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Own Issue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/issues/{{ISSUE_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"issues",
+								"{{ISSUE_ID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "Add Comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"issue\": \"{{ISSUE_ID}}\",\n    \"comment\": \"This pothole has damaged multiple cars. Please resolve it soon!\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST}}/api/comments",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Comments of Issue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/comments/{{ISSUE_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"comments",
+								"{{ISSUE_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Own Comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/comments/{{COMMENT_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"comments",
+								"{{COMMENT_ID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Support",
+			"item": [
+				{
+					"name": "Support Issue",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/support/{{ISSUE_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"support",
+								"{{ISSUE_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Support",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/support/{{ISSUE_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"support",
+								"{{ISSUE_ID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin Panel",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/admin/users",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Issues (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/admin/issues",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"issues"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Issue Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Verified\"\n}"
+						},
+						"url": {
+							"raw": "{{HOST}}/api/admin/issues/{{ISSUE_ID}}/status",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"issues",
+								"{{ISSUE_ID}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/admin/dashboard",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/admin/users/{{USER_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"{{USER_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Issue (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/admin/issues/{{ISSUE_ID}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"issues",
+								"{{ISSUE_ID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "HOST",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ISSUE_ID",
+			"value": "issue_mongodb_object_id_here",
+			"type": "string"
+		},
+		{
+			"key": "COMMENT_ID",
+			"value": "comment_mongodb_object_id_here",
+			"type": "string"
+		},
+		{
+			"key": "USER_ID",
+			"value": "user_mongodb_object_id_here",
+			"type": "string"
+		}
+	]
+}
