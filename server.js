@@ -12,13 +12,13 @@ dotenv.config();
 connectDB();
 
 const app = express();
-
+app.use(cors());
 // Standard Request Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configure CORS
-app.use(cors());
+
 
 // Serve uploads folder static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
