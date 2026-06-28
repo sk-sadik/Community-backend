@@ -1,19 +1,25 @@
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('cloudinary').v2;
 const User = require('../models/User');
 const Issue = require('../models/Issue');
 const Comment = require('../models/Comment');
 const Support = require('../models/Support');
 
-// Helper to delete an image file from the system
-const deleteImageFile = (relativeFilePath) => {
-  if (!relativeFilePath) return;
-  const absolutePath = path.join(__dirname, '..', relativeFilePath);
-  fs.unlink(absolutePath, (err) => {
-    if (err) {
-      console.error(`Failed to delete file at ${absolutePath}:`, err.message);
+// Helper to delete an image from Cloudinary
+// Accepts either a full Cloudinary URL or a public_id string
+const deleteCloudinaryImage = async (imageUrl) => {
+  if (!imageUrl) return;
+  try {
+    // Extract public_id from Cloudinary URL
+    // URL format: https://res.cloudinary.com/<cloud>/image/upload/v<ts>/<folder>/<public_id>.<ext>
+    const match = imageUrl.match(/\/v\d+\/(.+)\.[\w]+$/);
+    if (match && match[1]) {
+      const publicId = match[1];
+      await cloudinary.uploader.destroy(publicId);
+      console.log(`Deleted image from Cloudinary: ${publicId}`);
     }
-  });
+  } catch (err) {
+    console.error('Failed to delete image from Cloudinary:', err.message);
+  }
 };
 
 // @desc    View all users
@@ -59,10 +65,10 @@ exports.deleteUser = async (req, res, next) => {
     await Comment.deleteMany({ user: user._id });
     await Support.deleteMany({ user: user._id });
 
-    // Clean up issues reported by this user (including files)
+    // Clean up issues reported by this user (including Cloudinary images)
     const userIssues = await Issue.find({ reportedBy: user._id });
     for (const issue of userIssues) {
-      deleteImageFile(issue.image);
+      await deleteCloudinaryImage(issue.image);
       await Comment.deleteMany({ issue: issue._id });
       await Support.deleteMany({ issue: issue._id });
       await issue.deleteOne();
@@ -113,8 +119,8 @@ exports.deleteIssueByAdmin = async (req, res, next) => {
       });
     }
 
-    // Delete image file
-    deleteImageFile(issue.image);
+    // Delete image from Cloudinary
+    await deleteCloudinaryImage(issue.image);
 
     // Delete related comments & support
     await Comment.deleteMany({ issue: issue._id });

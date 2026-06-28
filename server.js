@@ -43,6 +43,34 @@ app.get('/', (req, res) => {
   });
 });
 
+// Cloudinary Test Endpoint
+app.get('/api/test-cloudinary', (req, res) => {
+  const cloudinary = require('./config/cloudinary');
+  const configStatus = {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? 'Configured' : 'Missing',
+    api_key: process.env.CLOUDINARY_API_KEY ? 'Configured' : 'Missing',
+    api_secret: process.env.CLOUDINARY_API_SECRET ? 'Configured' : 'Missing'
+  };
+  
+  cloudinary.api.ping((error, result) => {
+    if (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Cloudinary connection failed',
+        config: configStatus,
+        error: error.message
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: 'Cloudinary connection successful',
+        config: configStatus,
+        result: result
+      });
+    }
+  });
+});
+
 // Catch-All 404 Route
 app.use((req, res, next) => {
   res.status(404).json({

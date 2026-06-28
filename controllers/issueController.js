@@ -1,18 +1,22 @@
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('cloudinary').v2;
 const Issue = require('../models/Issue');
 
-// Helper to delete an image file from the system
-const deleteImageFile = (relativeFilePath) => {
-  if (!relativeFilePath) return;
-  const absolutePath = path.join(__dirname, '..', relativeFilePath);
-  fs.unlink(absolutePath, (err) => {
-    if (err) {
-      console.error(`Failed to delete file at ${absolutePath}:`, err.message);
-    } else {
-      console.log(`Successfully deleted file: ${absolutePath}`);
+// Helper to delete an image from Cloudinary by its full URL
+const deleteImageFile = async (imageUrl) => {
+  if (!imageUrl) return;
+  try {
+    // Extract public_id from Cloudinary URL
+    // Handles: https://res.cloudinary.com/<cloud>/image/upload/v<ts>/<folder>/<public_id>.<ext>
+    // Also handles transformation params like /c_fill,w_400/v1234...
+    const match = imageUrl.match(/\/v\d+\/(.+)\.[\w]+$/);
+    if (match && match[1]) {
+      const publicId = match[1];
+      await cloudinary.uploader.destroy(publicId);
+      console.log(`Successfully deleted image from Cloudinary: ${publicId}`);
     }
-  });
+  } catch (err) {
+    console.error(`Failed to delete image from Cloudinary:`, err.message);
+  }
 };
 
 // @desc    Create a new issue
@@ -38,7 +42,7 @@ exports.createIssue = async (req, res, next) => {
           locationData = JSON.parse(req.body.location);
         } catch (e) {
           // Delete uploaded file if parsing fails
-          deleteImageFile(`uploads/${req.file.filename}`);
+          await deleteImageFile(req.file.path);
           return res.status(400).json({
             success: false,
             message: 'Invalid location JSON format'
@@ -61,14 +65,14 @@ exports.createIssue = async (req, res, next) => {
 
     // Validate location address & city
     if (!locationData.address || !locationData.city) {
-      deleteImageFile(`uploads/${req.file.filename}`);
+      await deleteImageFile(req.file.path);
       return res.status(400).json({
         success: false,
         message: 'Location address and city are required'
       });
     }
 
-    const imagePath = `uploads/${req.file.filename}`;
+    const imagePath = req.file.path; // Cloudinary returns the full HTTPS URL as req.file.path
 
     const issue = await Issue.create({
       title,
@@ -89,7 +93,7 @@ exports.createIssue = async (req, res, next) => {
   } catch (error) {
     // Cleanup uploaded file on error
     if (req.file) {
-      deleteImageFile(`uploads/${req.file.filename}`);
+      await deleteImageFile(req.file.path);
     }
     next(error);
   }
@@ -184,7 +188,7 @@ exports.updateIssue = async (req, res, next) => {
     // Verify ownership (only the user who reported it can update it)
     if (issue.reportedBy.toString() !== req.user.id) {
       if (req.file) {
-        deleteImageFile(`uploads/${req.file.filename}`);
+        await deleteImageFile(req.file.path);
       }
       return res.status(403).json({
         success: false,
@@ -209,7 +213,7 @@ exports.updateIssue = async (req, res, next) => {
           try {
             locationData = JSON.parse(req.body.location);
           } catch (e) {
-            if (req.file) deleteImageFile(`uploads/${req.file.filename}`);
+            if (req.file) await deleteImageFile(req.file.path);
             return res.status(400).json({
               success: false,
               message: 'Invalid location JSON format'
@@ -236,8 +240,8 @@ exports.updateIssue = async (req, res, next) => {
     // Handle image update
     if (req.file) {
       // Delete old image file
-      deleteImageFile(issue.image);
-      updateData.image = `uploads/${req.file.filename}`;
+      await deleteImageFile(issue.image);
+      updateData.image = req.file.path;
     }
 
     // Save and return
@@ -253,7 +257,7 @@ exports.updateIssue = async (req, res, next) => {
     });
   } catch (error) {
     if (req.file) {
-      deleteImageFile(`uploads/${req.file.filename}`);
+      await deleteImageFile(req.file.path);
     }
     next(error);
   }
@@ -278,7 +282,7 @@ exports.deleteIssue = async (req, res, next) => {
     }
 
     // Clean up uploaded image
-    deleteImageFile(issue.image);
+    await deleteImageFile(issue.image);
 
     // Delete issue from DB
     await issue.deleteOne();
